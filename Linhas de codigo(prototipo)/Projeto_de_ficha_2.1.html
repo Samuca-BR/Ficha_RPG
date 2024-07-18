@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha de RPG de Mesa</title>
+    <link rel="stylesheet" type="text/css" href="rpgstyle.css">
+</head>
+
+<body>
+    <header id="cabecalho">
+        <nav class=menu>
+            <h3>Menu Principal:</h3>
+                <ol type="I" start="12">
+                    <li ><a href="Login.html" >Login</a></li>
+                    <li ><a href="https://bibliotecaelfica.org/category/tormenta-rpg/" >Tormenta RPG</a></li>
+                    <li ><a href="https://bibliotecaelfica.org/category/dd-5e/" >Dungeons & Dragons</a></li>
+                    <li ><a href="https://bibliotecaelfica.org/category/chamado-de-cthulhu/" >Chaos of Ctulhu</a></li>
+                </ol>
+           </nav>
+    
+    </header>
+    <div class="container">
+        <h1>Ficha de RPG de Mesa</h1>
+        <div class="ficha">
+            <div class="campo">
+                <label for="nome">Nome:</label>
+                <input type="text" id="nome" name="nome">
+            </div>
+            <div class="campo">
+                <label for="classe">Classe:</label>
+                <input type="text" id="classe" name="classe">
+            </div>  
+                <div class="campo">
+                    <label for="xp">XP Atual:</label>
+                    <input type="number" id="xp" name="xp">
+                </div>
+                <div class="campo">
+                    <button onclick="calcularNivel()">Calcular Nível</button>
+                </div>
+                <div class="resultado">
+                    <h2>Nível Calculado:</h2>
+                    <p id="nivel"></p>
+                </div>
+            <div class="campo">
+                <label for="atributo-forca">Força:</label>
+                <input type="number" id="atributo-forca" name="atributo-forca">
+                <span id="mod-forca"></span>
+            </div>
+            <div class="campo">
+                <label for="atributo-destreza">Destreza:</label>
+                <input type="number" id="atributo-destreza" name="atributo-destreza">
+                <span id="mod-destreza"></span>
+            </div>
+            <div class="campo">
+                <label for="atributo-inteligencia">Inteligência:</label>
+                <input type="number" id="atributo-inteligencia" name="atributo-inteligencia">
+                <span id="mod-inteligencia"></span>
+            </div>
+            <div class="campo">
+                <label for="atributo-inteligencia">Constituição:</label>
+                <input type="number" id="atributo-constituicao" name="atributo-constituicao">
+                <span id="mod-constituicao"></span>
+            </div>
+            <div class="campo">
+                <label for="atributo-inteligencia">Sábedoria:</label>
+                <input type="number" id="atributo-sabedoria" name="atributo-sabedoria">
+                <span id="mod-sabedoria"></span>
+            </div>
+            <div class="campo">
+                <label for="atributo-inteligencia">Carisma:</label>
+                <input type="number" id="atributo-carisma" name="atributo-carisma">
+                <span id="mod-carisma"></span>
+            </div>
+            <div class="campo">
+                <label for="ca">Classe de Armadura (CA):</label>
+                <span id="ca"></span>
+            </div>
+            
+            <!-- Seção de Perícias -->
+            <h2>Perícias</h2>
+            <div class="campo">
+                <label for="pericia1">Perícia 1:</label>
+                <input type="text" id="pericia1" name="pericia1">
+            </div>
+            <div class="campo">
+                <label for="pericia2">Perícia 2:</label>
+                <input type="text" id="pericia2" name="pericia2">
+            </div>
+            
+            <!-- Seção de Talentos e Magias -->
+            <h2>Talentos e Magias</h2>
+            <div class="campo">
+                <textarea id="talentos-magias" name="talentos-magias"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Função para calcular o modificador de atributos
+        function calcularModificador(atributoId, modificadorId) {
+            var atributo = parseInt(document.getElementById(atributoId).value);
+            var modificador = Math.floor((atributo - 10) / 2);
+            document.getElementById(modificadorId).textContent = "Modificador: " + modificador;
+        }
+
+        // Calcular modificador quando os atributos são alterados
+        document.getElementById("atributo-forca").addEventListener("input", function () {
+            calcularModificador("atributo-forca", "mod-forca");
+        });
+
+        document.getElementById("atributo-destreza").addEventListener("input", function () {
+            calcularModificador("atributo-destreza", "mod-destreza");
+        });
+
+        document.getElementById("atributo-inteligencia").addEventListener("input", function () {
+            calcularModificador("atributo-inteligencia", "mod-inteligencia");
+        });
+
+        document.getElementById("atributo-constituicao").addEventListener("input", function () {
+            calcularModificador("atributo-constituicao", "mod-constituicao");
+        });
+
+        document.getElementById("atributo-sabedoria").addEventListener("input", function () {
+            calcularModificador("atributo-sabedoria", "mod-sabedoria");
+        });
+
+        document.getElementById("atributo-carisma").addEventListener("input", function () {
+            calcularModificador("atributo-carisma", "mod-carisma");
+        });
+        // Função para calcular a Classe de Armadura (CA) - exemplo básico
+        function calcularCA() {
+            var ca = 10; // CA base
+            // Adicione lógica para calcular CA com base em itens, atributos, etc.
+            document.getElementById("ca").textContent = "CA: " + ca;
+        }
+
+        // Calcular CA ao carregar a página
+        window.onload = calcularCA;
+
+        // Calular o xp
+        function calcularNivel() {
+            var xp = parseInt(document.getElementById("xp").value);
+            var nivel = 1;
+
+            // Mapeia faixas de XP para níveis
+            if (xp >= 0 && xp < 1000) {
+                nivel = 1;
+            } else if (xp >= 1000 && xp < 3000) {
+                nivel = 2;
+            } else if (xp >= 3000 && xp < 6000) {
+                nivel = 3;
+            } else if (xp >= 6000 && xp < 10000) {
+                nivel = 4;
+            } else if (xp >= 10000 && xp < 15000) {
+                nivel = 5;
+            }else if (xp >= 15000 && xp < 21000) {
+                nivel = 6;
+            }else if (xp >= 21000 && xp < 28000) {
+                nivel = 7;
+            }else if (xp >= 28000 && xp < 36000) {
+                nivel = 8;
+            }else if (xp >= 36000 && xp < 45000) {
+                nivel = 9;
+            }else if (xp >= 45000 && xp < 55000) {
+                nivel = 10;
+            }else if (xp >= 55000 && xp < 66000) {
+                nivel = 11;
+            }else if (xp >= 66000 && xp < 78000) {
+                nivel = 12;
+            }else if (xp >= 780000 && xp < 91000) {
+                nivel = 13;
+            }else if (xp >= 910000 && xp < 105000) {
+                nivel = 14;
+            }else if (xp >= 105000 && xp < 120000) {
+                nivel = 15;
+            }else if (xp >= 1200000 && xp < 136000) {
+                nivel = 16;
+            }else if (xp >= 1360000 && xp < 153000) {
+                nivel = 17;
+            }else if (xp >= 153000 && xp < 171000) {
+                nivel = 18;
+            }else if (xp >= 1710000 && xp < 190000) {
+                nivel = 19;
+            }else if (xp >= 190.000 && xp <= 210000) {
+                nivel = 20;
+            }
+            
+            // Adicione mais faixas de XP conforme necessário
+
+            document.getElementById("nivel").textContent = "Nível: " + nivel;
+        }
+    </script>
+</body>
+
+</html>
