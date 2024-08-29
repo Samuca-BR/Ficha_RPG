@@ -10,17 +10,17 @@
 
 <body>
     <header id="cabecalho">
-        <nav class=menu>
+        <nav class="menu">
             <h3>Menu Principal:</h3>
-                <ol type="I" start="12">
-                    <li ><a href="Login.html" >Login</a></li>
-                    <li ><a href="https://bibliotecaelfica.org/category/tormenta-rpg/" >Tormenta RPG</a></li>
-                    <li ><a href="https://bibliotecaelfica.org/category/dd-5e/" >Dungeons & Dragons</a></li>
-                    <li ><a href="https://bibliotecaelfica.org/category/chamado-de-cthulhu/" >Chaos of Ctulhu</a></li>
-                </ol>
-           </nav>
-    
+            <ol type="I" start="12">
+                <li><a href="Login.html">Login</a></li>
+                <li><a href="https://bibliotecaelfica.org/category/tormenta-rpg/">Tormenta RPG</a></li>
+                <li><a href="https://bibliotecaelfica.org/category/dd-5e/">Dungeons & Dragons</a></li>
+                <li><a href="https://bibliotecaelfica.org/category/chamado-de-cthulhu/">Chaos of Ctulhu</a></li>
+            </ol>
+        </nav>
     </header>
+
     <div class="container">
         <h1>Ficha de RPG de Mesa</h1>
         <div class="ficha">
@@ -31,64 +31,59 @@
             <div class="campo">
                 <label for="classe">Classe:</label>
                 <input type="text" id="classe" name="classe">
-            </div>  
-                <div class="campo">
-                    <label for="xp">XP Atual:</label>
-                    <input type="number" id="xp" name="xp">
-                </div>
-                <div class="campo">
-                    <button onclick="calcularNivel()">Calcular Nível</button>
-                </div>
-                <div class="resultado">
-                    <h2>Nível Calculado:</h2>
-                    <p id="nivel"></p>
-                </div>
-            <div class="campo">
-                <label for="atributo-forca">Força:</label>
-                <input type="number" id="atributo-forca" name="atributo-forca">
-                <span id="mod-forca"></span>
             </div>
             <div class="campo">
-                <label for="atributo-destreza">Destreza:</label>
-                <input type="number" id="atributo-destreza" name="atributo-destreza">
-                <span id="mod-destreza"></span>
+                <label for="xp">XP Atual:</label>
+                <input type="number" id="xp" name="xp">
             </div>
             <div class="campo">
-                <label for="atributo-inteligencia">Inteligência:</label>
-                <input type="number" id="atributo-inteligencia" name="atributo-inteligencia">
-                <span id="mod-inteligencia"></span>
+                <button onclick="calcularNivel()">Calcular Nível</button>
+            </div>
+            <div class="resultado">
+                <h2>Nível Calculado:</h2>
+                <p id="nivel"></p>
             </div>
             <div class="campo">
-                <label for="atributo-inteligencia">Constituição:</label>
-                <input type="number" id="atributo-constituicao" name="atributo-constituicao">
-                <span id="mod-constituicao"></span>
+                <label for="forca">Força:</label>
+                <input type="number" id="forca" onchange="atualizarModificadores()">
+                <span id="modificadorForca">Mod: 0</span>
             </div>
             <div class="campo">
-                <label for="atributo-inteligencia">Sábedoria:</label>
-                <input type="number" id="atributo-sabedoria" name="atributo-sabedoria">
-                <span id="mod-sabedoria"></span>
+                <label for="destreza">Destreza:</label>
+                <input type="number" id="destreza" onchange="atualizarModificadores()">
+                <span id="modificadorDestreza">Mod: 0</span>
             </div>
             <div class="campo">
-                <label for="atributo-inteligencia">Carisma:</label>
-                <input type="number" id="atributo-carisma" name="atributo-carisma">
-                <span id="mod-carisma"></span>
+                <label for="constituição">Constituição:</label>
+                <input type="number" id="constituição" onchange="atualizarModificadores()">
+                <span id="modificadorConstituicao">Mod: 0</span>
+            </div>
+            <div class="campo">
+                <label for="inteligencia">Inteligência:</label>
+                <input type="number" id="inteligencia" onchange="atualizarModificadores()">
+                <span id="modificadorInteligencia">Mod: 0</span>
+            </div>
+            <div class="campo">
+                <label for="sabedoria">Sabedoria:</label>
+                <input type="number" id="sabedoria" onchange="atualizarModificadores()">
+                <span id="modificadorSabedoria">Mod: 0</span>
+            </div>
+            <div class="campo">
+                <label for="carisma">Carisma:</label>
+                <input type="number" id="carisma" onchange="atualizarModificadores()">
+                <span id="modificadorCarisma">Mod: 0</span>
             </div>
             <div class="campo">
                 <label for="ca">Classe de Armadura (CA):</label>
-                <span id="ca"></span>
+                <span id="ca">0</span>
             </div>
-            
+
             <!-- Seção de Perícias -->
             <h2>Perícias</h2>
             <div class="campo">
-                <label for="pericia1">Perícia 1:</label>
-                <input type="text" id="pericia1" name="pericia1">
+                <textarea id="pericias" name="pericias"></textarea>
             </div>
-            <div class="campo">
-                <label for="pericia2">Perícia 2:</label>
-                <input type="text" id="pericia2" name="pericia2">
-            </div>
-            
+
             <!-- Seção de Talentos e Magias -->
             <h2>Talentos e Magias</h2>
             <div class="campo">
@@ -99,47 +94,45 @@
 
     <script>
         // Função para calcular o modificador de atributos
-        function calcularModificador(atributoId, modificadorId) {
-            var atributo = parseInt(document.getElementById(atributoId).value);
-            var modificador = Math.floor((atributo - 10) / 2);
-            document.getElementById(modificadorId).textContent = "Modificador: " + modificador;
+        function calcularModificador(atributo) {
+            return Math.floor((atributo - 10) / 2);
         }
 
-        // Calcular modificador quando os atributos são alterados
-        document.getElementById("atributo-forca").addEventListener("input", function () {
-            calcularModificador("atributo-forca", "mod-forca");
-        });
+        // Função para atualizar o display do modificador
+        function atualizarModificador(atributoId, modificadorId) {
+            var atributo = parseInt(document.getElementById(atributoId).value) || 0;
+            var modificador = calcularModificador(atributo);
+            document.getElementById(modificadorId).textContent = "Mod: " + modificador;
+            return modificador; // Retorna o modificador para uso em outros códigos
+        }
 
-        document.getElementById("atributo-destreza").addEventListener("input", function () {
-            calcularModificador("atributo-destreza", "mod-destreza");
-        });
+        // Função para atualizar todos os modificadores e a CA
+        function atualizarModificadores() {
+            var modificadorDestreza = atualizarModificador('destreza', 'modificadorDestreza');
+            atualizarModificador('forca', 'modificadorForca');
+            atualizarModificador('constituição', 'modificadorConstituicao');
+            atualizarModificador('inteligencia', 'modificadorInteligencia');
+            atualizarModificador('sabedoria', 'modificadorSabedoria');
+            atualizarModificador('carisma', 'modificadorCarisma');
 
-        document.getElementById("atributo-inteligencia").addEventListener("input", function () {
-            calcularModificador("atributo-inteligencia", "mod-inteligencia");
-        });
+            // Atualiza a Classe de Armadura
+            calcularCA();
+        }
 
-        document.getElementById("atributo-constituicao").addEventListener("input", function () {
-            calcularModificador("atributo-constituicao", "mod-constituicao");
-        });
-
-        document.getElementById("atributo-sabedoria").addEventListener("input", function () {
-            calcularModificador("atributo-sabedoria", "mod-sabedoria");
-        });
-
-        document.getElementById("atributo-carisma").addEventListener("input", function () {
-            calcularModificador("atributo-carisma", "mod-carisma");
-        });
-        // Função para calcular a Classe de Armadura (CA) - exemplo básico
+        // Função para calcular a CA
         function calcularCA() {
-            var ca = 10; // CA base
-            // Adicione lógica para calcular CA com base em itens, atributos, etc.
-            document.getElementById("ca").textContent = "CA: " + ca;
+            var nivel = parseInt(document.getElementById('nivel').textContent.replace('Nível: ', '')) || 1; // Obtém o nível
+            var caBase = 10; // CA base
+            var modificadorDestreza = parseInt(document.getElementById('modificadorDestreza').textContent.replace('Mod: ', '')) || 0; // Obtém o modificador de Destreza
+            var metadeNivel = Math.floor(nivel / 2); // Calcula metade do nível
+            var ca = caBase + modificadorDestreza + metadeNivel; // Calcula a CA com o modificador de Destreza e metade do nível
+            document.getElementById("ca").textContent = ca; // Atualiza o display da CA
         }
 
         // Calcular CA ao carregar a página
-        window.onload = calcularCA;
+        window.onload = atualizarModificadores;
 
-        // Calular o xp
+        // Calcular o nível
         function calcularNivel() {
             var xp = parseInt(document.getElementById("xp").value);
             var nivel = 1;
@@ -155,41 +148,41 @@
                 nivel = 4;
             } else if (xp >= 10000 && xp < 15000) {
                 nivel = 5;
-            }else if (xp >= 15000 && xp < 21000) {
+            } else if (xp >= 15000 && xp < 21000) {
                 nivel = 6;
-            }else if (xp >= 21000 && xp < 28000) {
+            } else if (xp >= 21000 && xp < 28000) {
                 nivel = 7;
-            }else if (xp >= 28000 && xp < 36000) {
+            } else if (xp >= 28000 && xp < 36000) {
                 nivel = 8;
-            }else if (xp >= 36000 && xp < 45000) {
+            } else if (xp >= 36000 && xp < 45000) {
                 nivel = 9;
-            }else if (xp >= 45000 && xp < 55000) {
+            } else if (xp >= 45000 && xp < 55000) {
                 nivel = 10;
-            }else if (xp >= 55000 && xp < 66000) {
+            } else if (xp >= 55000 && xp < 66000) {
                 nivel = 11;
-            }else if (xp >= 66000 && xp < 78000) {
+            } else if (xp >= 66000 && xp < 78000) {
                 nivel = 12;
-            }else if (xp >= 780000 && xp < 91000) {
+            } else if (xp >= 78000 && xp < 91000) {
                 nivel = 13;
-            }else if (xp >= 910000 && xp < 105000) {
+            } else if (xp >= 91000 && xp < 105000) {
                 nivel = 14;
-            }else if (xp >= 105000 && xp < 120000) {
+            } else if (xp >= 105000 && xp < 120000) {
                 nivel = 15;
-            }else if (xp >= 1200000 && xp < 136000) {
+            } else if (xp >= 120000 && xp < 136000) {
                 nivel = 16;
-            }else if (xp >= 1360000 && xp < 153000) {
+            } else if (xp >= 136000 && xp < 153000) {
                 nivel = 17;
-            }else if (xp >= 153000 && xp < 171000) {
+            } else if (xp >= 153000 && xp < 171000) {
                 nivel = 18;
-            }else if (xp >= 1710000 && xp < 190000) {
+            } else if (xp >= 171000 && xp < 190000) {
                 nivel = 19;
-            }else if (xp >= 190.000 && xp <= 210000) {
+            } else if (xp >= 190000 && xp <= 210000) {
                 nivel = 20;
             }
-            
-            // Adicione mais faixas de XP conforme necessário
 
+            // Atualiza o nível calculado na página
             document.getElementById("nivel").textContent = "Nível: " + nivel;
+            calcularCA(); // Recalcula a CA ao atualizar o nível
         }
     </script>
 </body>
