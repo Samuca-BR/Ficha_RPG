@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil do Usuário</title>
+    <link rel="stylesheet" type="text/css" href="/css/styles.css"> <!-- Seu arquivo CSS -->
+</head>
+<body>
+    <header id="cabecalho">
+        <nav class="menu">
+            <ul class="menu-list">
+                <li class="menu-item"><a href="/">Início</a></li>
+                <li class="menu-item"><a href="/logout">Sair</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Perfil do Usuário</h1>
+        <p>Bem-vindo! Aqui estão suas fichas:</p>
+
+        <ul class="fichas-list">
+            <% if (fichas.length > 0) { %>
+                <% fichas.forEach(ficha => { %>
+                    <li class="ficha-item">
+                        <a href="/ficha/<%= ficha.ficha_id %>">
+                            <strong>Nome do Personagem:</strong> <%= ficha.nome_personagem %> <br>
+                            <strong>XP:</strong> <%= ficha.xp %> <br>
+                            <strong>Vida Total:</strong> <%= ficha.vida_total %>
+                        </a>
+                    </li>
+                <% }) %>
+            <% } else { %>
+                <p>Você ainda não tem fichas. <a href="/ficha">Crie uma nova ficha</a>.</p>
+            <% } %> <!-- Fechamento do bloco if -->
+        </ul>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 - Seu Nome ou Projeto</p>
+    </footer>
+</body>
+</html>

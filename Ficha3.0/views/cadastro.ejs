@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro</title>
+    <link rel="stylesheet" href="/css/styles.css"> <!-- Altere para o caminho correto do CSS -->
+</head>
+<body>
+    <header id="cabecalho">
+        <h1>Bem-vindo ao Sistema de Ficha</h1>
+    </header>
+    <div class="container login-cadastro">
+        <div class="form-container">
+            <h2>Cadastro</h2>
+            <form action="/cadastro" method="POST">
+                <div class="campo">
+                    <label for="nome_usuario">Nome de Usuário:</label>
+                    <input type="text" id="nome_usuario" name="nome_usuario" required>
+                </div>
+                <div class="campo">
+                    <label for="senha">Senha:</label>
+                    <input type="password" id="senha" name="senha" required>
+                </div>
+                <div class="campo">
+                    <button type="submit">Cadastrar</button>
+                </div>
+                <div class="mensagem">
+                    <!-- Aqui você pode exibir mensagens de erro/sucesso -->
+                </div>
+            </form>
+            <div class="link-troca">
+                <p>Já tem uma conta? <a href="/login">Faça login aqui</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
