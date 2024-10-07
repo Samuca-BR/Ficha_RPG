@@ -126,6 +126,18 @@ app.get('/ficha/:fichaId', (req, res) => {
     });
 });
 
+// Rota para logout
+app.get('/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            console.error('Erro ao encerrar a sessão:', err);
+            return res.status(500).send('Erro ao fazer logout');
+        }
+        res.redirect('/login'); // Redireciona para a página de login após o logout
+    });
+});
+
+
 // Inicia o servidor
 app.listen(3000, () => {
     console.log('Servidor rodando na porta 3000');
