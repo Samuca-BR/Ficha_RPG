@@ -8,9 +8,9 @@ const app = express();
 // Configurações do banco de dados
 const db = mysql.createConnection({
     host: 'localhost',
-    user: 'root', // Altere para o seu usuário do MySQL
-    password: 'aluno01', // Altere para a sua senha do MySQL
-    database: 'ficha' // Altere para o seu banco de dados
+    user: 'root',
+    password: 'aluno01',
+    database: 'RPG'
 });
 
 db.connect(err => {
@@ -23,7 +23,7 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use(session({
-    secret: 'seu_segredo', // Altere para um segredo forte
+    secret: 'seu_segredo',
     resave: false,
     saveUninitialized: true,
 }));
@@ -41,7 +41,7 @@ app.get('/cadastro', (req, res) => {
 // Rota para processar o cadastro
 app.post('/cadastro', (req, res) => {
     const { nome_usuario, senha } = req.body;
-    const senha_hash = require('crypto').createHash('sha256').update(senha).digest('hex'); // Hash da senha
+    const senha_hash = require('crypto').createHash('sha256').update(senha).digest('hex');
 
     const sql = 'INSERT INTO usuario (nome_usuario, senha_hash) VALUES (?, ?)';
     db.query(sql, [nome_usuario, senha_hash], (err, result) => {
@@ -56,40 +56,35 @@ app.post('/cadastro', (req, res) => {
 // Rota para processar o login
 app.post('/login', (req, res) => {
     const { nome_usuario, senha } = req.body;
-    const senha_hash = require('crypto').createHash('sha256').update(senha).digest('hex'); // Hash da senha
+    const senha_hash = require('crypto').createHash('sha256').update(senha).digest('hex');
 
     const sql = 'SELECT * FROM usuario WHERE nome_usuario = ? AND senha_hash = ?';
-    db.query(sql, [nome_usuario, senha_hash], (err, result) => {
+    db.query(sql, [nome_usuario, senha_hash], (err, results) => {
         if (err) {
             console.error(err);
             return res.status(500).send('Erro ao fazer login');
         }
-        if (result.length > 0) {
-            req.session.userId = result[0].usuario_id; // Armazena o ID do usuário na sessão
-            return res.redirect('/'); // Redireciona para a página inicial
+        if (results.length > 0) {
+            req.session.userId = results[0].id;
+            return res.redirect('/perfil');
+        } else {
+            res.send('Usuário ou senha incorretos');
         }
-        res.send('Usuário ou senha incorretos');
     });
 });
 
-// Rota para exibir a página inicial
+// Rota inicial que redireciona para o perfil, se logado
 app.get('/', (req, res) => {
-    res.render('index'); // Renderiza a página inicial
-});
-
-
-// Rota para exibir a página da ficha
-app.get('/ficha', (req, res) => {
-    if (!req.session.userId) {
-        return res.redirect('/login'); // Redireciona para o login se não estiver autenticado
+    if (req.session.userId) {
+        return res.redirect('/perfil');
     }
-    res.render('ficha'); // Renderiza a ficha
+    res.render('index');
 });
 
-// Rota para exibir o perfil do usuário
+// Rota para exibir o perfil do usuário e suas fichas
 app.get('/perfil', (req, res) => {
     if (!req.session.userId) {
-        return res.redirect('/login'); // Redireciona para o login se o usuário não estiver autenticado
+        return res.redirect('/login');
     }
 
     const sql = 'SELECT * FROM ficha WHERE usuario_id = ?';
@@ -99,27 +94,47 @@ app.get('/perfil', (req, res) => {
             return res.status(500).send('Erro ao buscar fichas');
         }
         
-        res.render('perfil', { fichas: results }); // Envia as fichas para a página de perfil
+        res.render('perfil', { fichas: results });
     });
 });
 
-// Rota para exibir uma ficha específica
+// Rota para exibir uma ficha específica com suas perícias e talentos/magias
 app.get('/ficha/:fichaId', (req, res) => {
     if (!req.session.userId) {
-        return res.redirect('/login'); // Redireciona para o login se não estiver autenticado
+        return res.redirect('/login');
     }
 
     const fichaId = req.params.fichaId;
-    const sql = 'SELECT * FROM ficha WHERE ficha_id = ? AND usuario_id = ?';
-    
-    db.query(sql, [fichaId, req.session.userId], (err, result) => {
+    const fichaQuery = 'SELECT * FROM ficha WHERE id = ? AND usuario_id = ?';
+    const periciaQuery = 'SELECT * FROM pericia WHERE ficha_id = ?';
+    const talentosMagiasQuery = 'SELECT * FROM talentos_magias WHERE ficha_id = ?';
+
+    db.query(fichaQuery, [fichaId, req.session.userId], (err, fichaResults) => {
         if (err) {
             console.error(err);
             return res.status(500).send('Erro ao buscar ficha');
         }
         
-        if (result.length > 0) {
-            res.render('ficha', { ficha: result[0] }); // Renderiza a página da ficha com os dados da ficha
+        if (fichaResults.length > 0) {
+            db.query(periciaQuery, [fichaId], (err, periciaResults) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).send('Erro ao buscar perícias');
+                }
+
+                db.query(talentosMagiasQuery, [fichaId], (err, talentosMagiasResults) => {
+                    if (err) {
+                        console.error(err);
+                        return res.status(500).send('Erro ao buscar talentos e magias');
+                    }
+
+                    res.render('ficha', {
+                        ficha: fichaResults[0],
+                        pericias: periciaResults,
+                        talentosMagias: talentosMagiasResults
+                    });
+                });
+            });
         } else {
             res.status(404).send('Ficha não encontrada');
         }
@@ -133,10 +148,36 @@ app.get('/logout', (req, res) => {
             console.error('Erro ao encerrar a sessão:', err);
             return res.status(500).send('Erro ao fazer logout');
         }
-        res.redirect('/login'); // Redireciona para a página de login após o logout
+        res.redirect('/login');
     });
 });
 
+app.post('/ficha/salvar', (req, res) => {
+    // Verifica se o usuário está autenticado
+    if (!req.session.userId) {
+        return res.status(403).send('Usuário não autenticado');
+    }
+
+    // Extrai os dados da ficha enviados pelo formulário
+    const { nome, classe, vida_total, vida_atual, xp, forca, destreza, constituicao, inteligencia, sabedoria, carisma, ca } = req.body;
+
+    // Consulta SQL para inserir uma nova ficha na tabela
+    const sql = `
+        INSERT INTO ficha (nome, classe, vida_total, vida_atual, xp, forca, destreza, constituicao, inteligencia, sabedoria, carisma, ca, usuario_id) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    const values = [nome, classe, vida_total, vida_atual, xp, forca, destreza, constituicao, inteligencia, sabedoria, carisma, ca, req.session.userId];
+
+    // Executa a query para salvar a ficha no banco
+    db.query(sql, values, (err, result) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Erro ao salvar ficha');
+        }
+        // Redireciona para a página de perfil do usuário após salvar a ficha
+        res.redirect('/perfil');
+    });
+});
 
 // Inicia o servidor
 app.listen(3000, () => {
