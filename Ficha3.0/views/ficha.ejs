@@ -23,23 +23,23 @@
         <div class="ficha">
             <div class="campo">
                 <label for="nome">Nome:</label>
-                <input type="text" id="nome" name="nome" value="<%= ficha.nome %>" required>
+                <input type="text" id="nome" name="nome">
             </div>
             <div class="campo">
                 <label for="classe">Classe:</label>
-                <input type="text" id="classe" name="classe" value="<%= ficha.classe %>" required>
+                <input type="text" id="classe" name="classe">
             </div>
             <div class="campo">
                 <label for="vida-total">Vida Total:</label>
-                <input type="number" id="vida-total" name="vida_total" value="<%= ficha.vida_total %>" required>
+                <input type="number" id="vida-total" name="vida-total">
             </div>
             <div class="campo">
                 <label for="vida-atual">Vida Atual:</label>
-                <input type="number" id="vida-atual" name="vida_atual" value="<%= ficha.vida_atual %>" required>
+                <input type="number" id="vida-atual" name="vida-atual">
             </div>
             <div class="campo">
                 <label for="xp">XP Atual:</label>
-                <input type="number" id="xp" name="xp" value="<%= ficha.xp %>" required>
+                <input type="number" id="xp" name="xp">
             </div>
             <div class="campo">
                 <button onclick="calcularNivel()">Calcular Nível</button>
@@ -50,32 +50,32 @@
             </div>
             <div class="campo">
                 <label for="forca">Força:</label>
-                <input type="number" id="forca" name="forca" value="<%= ficha.forca %>" required  onchange="atualizarModificadores()">
+                <input type="number" id="forca" onchange="atualizarModificadores()">
                 <span id="modificadorForca">Mod: 0</span>
             </div>
             <div class="campo">
                 <label for="destreza">Destreza:</label>
-                <input type="number" id="destreza" name="destreza" value="<%= ficha.destreza %>" required  onchange="atualizarModificadores()">
+                <input type="number" id="destreza" onchange="atualizarModificadores()">
                 <span id="modificadorDestreza">Mod: 0</span>
             </div>
             <div class="campo">
                 <label for="constituição">Constituição:</label>
-                <input type="number" id="constituição" name="constituicao" value="<%= ficha.constituicao %>" required  onchange="atualizarModificadores()">
+                <input type="number" id="constituição" onchange="atualizarModificadores()">
                 <span id="modificadorConstituicao">Mod: 0</span>
             </div>
             <div class="campo">
                 <label for="inteligencia">Inteligência:</label>
-                <input type="number" id="inteligencia" name="inteligencia" value="<%= ficha.inteligencia %>" required  onchange="atualizarModificadores()">
+                <input type="number" id="inteligencia" onchange="atualizarModificadores()">
                 <span id="modificadorInteligencia">Mod: 0</span>
             </div>
             <div class="campo">
                 <label for="sabedoria">Sabedoria:</label>
-                <input type="number" id="sabedoria" name="sabedoria" value="<%= ficha.sabedoria %>" required onchange="atualizarModificadores()">
+                <input type="number" id="sabedoria" onchange="atualizarModificadores()">
                 <span id="modificadorSabedoria">Mod: 0</span>
             </div>
             <div class="campo">
                 <label for="carisma">Carisma:</label>
-                <input type="number" id="carisma" name="carisma" value="<%= ficha.carisma %>" required onchange="atualizarModificadores()">
+                <input type="number" id="carisma" onchange="atualizarModificadores()">
                 <span id="modificadorCarisma">Mod: 0</span>
             </div>
             <div class="campo">
@@ -85,7 +85,7 @@
 
             <h2>Perícias</h2>
             <div class="campo">
-                <table id="tabela-pericias">
+                <table id="tabelapericias">
                     <thead>
                         <tr>
                             <th>Perícia</th>
@@ -260,9 +260,56 @@
             <h2>Talentos e Magias</h2>
             <div class="campo">
                 <textarea id="talentos-magias" name="talentos-magias"></textarea>
+                <button id="salvar" onclick="salvarFicha()">Salvar</button>
             </div>
         </div>
     </div>
+        <script src="/js/ficha.js" defer></script> <!-- Vincula o JavaScript externo das funções de calculo -->
+    <script src="/js/perícias.js" defer></script> <!--Vincula o JavaScript externo para função de salvar as pericias da ficha-->
+<script>
+  function salvarFicha() {
+    const fichaData = {
+      nome: document.getElementById('nome').value,
+      classe: document.getElementById('classe').value,
+      vida_total: 100, // Exemplo: substitua com valor real
+      vida_atual: 80,
+      xp: 2000,
+      forca: 10,
+      destreza: 12,
+      constituicao: 14,
+      inteligencia: 13,
+      sabedoria: 15,
+      carisma: 9,
+      ca: 15,
+      usuario_id: 1, // Substitua pelo ID do usuário autenticado
+      pericias: [
+        { nome: 'acrobacia', possui: true, bonus: 2, treino: false, total: 5, anotacao: 'Anotação aqui' }
+        // Adicione outras perícias aqui
+      ],
+      talentosMagias: [
+        { descricao: 'Descrição do talento ou magia' }
+        // Adicione outros talentos e magias aqui
+      ]
+    };
+
+    fetch('/salvarFicha', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(fichaData)
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Ficha salva com sucesso!');
+      } else {
+        alert(data.error);
+      }
+    })
+    .catch(error => console.error('Erro ao salvar ficha:', error));
+  }
+</script>
 </body>
 
 </html>
