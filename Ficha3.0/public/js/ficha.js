@@ -141,6 +141,10 @@ function atualizarTotal(pericia) {
     document.getElementById(`total-${pericia}`).textContent = total;
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    pericias.forEach(pericia => atualizarTotal(pericia));
+});
+
 // Inicializar todos os campos de total
 const pericias = [
     'acrobacia', 'animais', 'atletismo', 'cavalgar', 'conhecimento', 'cura', 'diplomacia', 
@@ -149,3 +153,59 @@ const pericias = [
 ];
 
 pericias.forEach(pericia => atualizarTotal(pericia));
+
+// Rota para salvar ficha
+app.post('/salvar-ficha', async (req, res) => {
+  const { nome, classe, vidaTotal, vidaAtual, xp, forca, destreza, constituicao, inteligencia, sabedoria, carisma, ca, usuarioId, pericias } = req.body;
+
+  try {
+    const connection = await mysql.createConnection(dbConfig);
+
+    // Inicia uma transação para garantir consistência
+    await connection.beginTransaction();
+
+    // Insere os dados da ficha
+    const [fichaResult] = await connection.execute(
+      `INSERT INTO ficha (nome, classe, vida_total, vida_atual, xp, forca, destreza, constituicao, inteligencia, sabedoria, carisma, ca, usuario_id) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [nome, classe, vidaTotal, vidaAtual, xp, forca, destreza, constituicao, inteligencia, sabedoria, carisma, ca, usuarioId]
+    );
+
+    const fichaId = fichaResult.insertId;
+
+    // Insere as perícias
+    for (const pericia of pericias) {
+      const { nome, possui, bonus, treino, total, anotacao } = pericia;
+
+      await connection.execute(
+        `INSERT INTO tabelapericias (nome, possui, bonus, treino, total, anotacao, ficha_id)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [nome, possui, bonus, treino, total, anotacao, fichaId]
+      );
+    }
+
+    // Se houver talentos/magias, insira também
+    if (req.body.talentosMagias) {
+      for (const talento of req.body.talentosMagias) {
+        await connection.execute(
+          `INSERT INTO talentosmagias (descricao, ficha_id)
+           VALUES (?, ?)`,
+          [talento.descricao, fichaId]
+        );
+      }
+    }
+
+    // Confirma a transação
+    await connection.commit();
+    connection.end();
+
+    res.status(200).send({ message: 'Ficha salva com sucesso!', fichaId });
+  } catch (error) {
+    console.error(error);
+
+    // Reverte a transação em caso de erro
+    if (connection) await connection.rollback();
+
+    res.status(500).send({ error: 'Erro ao salvar ficha. Por favor, tente novamente.' });
+  }
+});

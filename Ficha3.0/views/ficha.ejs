@@ -260,56 +260,11 @@
             <h2>Talentos e Magias</h2>
             <div class="campo">
                 <textarea id="talentos-magias" name="talentos-magias"></textarea>
-                <button id="salvar" onclick="salvarFicha()">Salvar</button>
+                
             </div>
         </div>
     </div>
         <script src="/js/ficha.js" defer></script> <!-- Vincula o JavaScript externo das funções de calculo -->
-    <script src="/js/perícias.js" defer></script> <!--Vincula o JavaScript externo para função de salvar as pericias da ficha-->
-<script>
-  function salvarFicha() {
-    const fichaData = {
-      nome: document.getElementById('nome').value,
-      classe: document.getElementById('classe').value,
-      vida_total: 100, // Exemplo: substitua com valor real
-      vida_atual: 80,
-      xp: 2000,
-      forca: 10,
-      destreza: 12,
-      constituicao: 14,
-      inteligencia: 13,
-      sabedoria: 15,
-      carisma: 9,
-      ca: 15,
-      usuario_id: 1, // Substitua pelo ID do usuário autenticado
-      pericias: [
-        { nome: 'acrobacia', possui: true, bonus: 2, treino: false, total: 5, anotacao: 'Anotação aqui' }
-        // Adicione outras perícias aqui
-      ],
-      talentosMagias: [
-        { descricao: 'Descrição do talento ou magia' }
-        // Adicione outros talentos e magias aqui
-      ]
-    };
-
-    fetch('/salvarFicha', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(fichaData)
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        alert('Ficha salva com sucesso!');
-      } else {
-        alert(data.error);
-      }
-    })
-    .catch(error => console.error('Erro ao salvar ficha:', error));
-  }
-</script>
 </body>
 
 </html>
