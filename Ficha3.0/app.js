@@ -144,7 +144,7 @@ app.post('/salvarFicha', (req, res) => {
 
             // Salvar talentos e magias
             const sqlTalentosMagias = `
-                INSERT INTO talentosmagias (descricao, ficha_id) VALUES (?, ?)
+                INSERT INTO talentos_magias (descricao, ficha_id) VALUES (?, ?)
             `;
             if (Array.isArray(talentosMagias)) {
                 talentosMagias.forEach(descricao => {
