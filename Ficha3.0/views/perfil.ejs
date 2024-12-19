@@ -21,25 +21,51 @@
         <h1>Perfil do Usuário</h1>
         <p>Bem-vindo! Aqui estão suas fichas:</p>
 
-        <ul class="fichas-list">
-            <% if (fichas.length > 0) { %>
-                <% fichas.forEach(ficha => { %>
-                    <li class="ficha-item">
-                        <a href="/ficha/<%= ficha.ficha_id %>">
-                            <strong>Nome do Personagem:</strong> <%= ficha.nome_personagem %> <br>
-                            <strong>XP:</strong> <%= ficha.xp %> <br>
-                            <strong>Vida Total:</strong> <%= ficha.vida_total %>
-                        </a>
-                    </li>
-                <% }) %>
-            <% } else { %>
-                <p>Você ainda não tem fichas. <a href="/ficha">Crie uma nova ficha</a>.</p>
-            <% } %> <!-- Fechamento do bloco if -->
-        </ul>
+        <ul class="fichas-list" id="listaFichas">
+    <!-- A listagem será gerada dinamicamente com JavaScript -->
+</ul>
+<p id="mensagemVazia" style="display: none;">Você ainda não tem fichas. <a href="/ficha">Crie uma nova ficha</a>.</p>
+
     </main>
 
     <footer>
         <p>&copy; 2024 - Seu Nome ou Projeto</p>
     </footer>
+    <script>
+   function listarFichas() {
+    const fichasSalvas = JSON.parse(localStorage.getItem('fichas')) || [];
+    const listaFichas = document.getElementById('listaFichas');
+    const mensagemVazia = document.getElementById('mensagemVazia');
+
+    listaFichas.innerHTML = ''; // Limpa a lista antes de renderizar
+
+    if (fichasSalvas.length > 0) {
+        mensagemVazia.style.display = 'none'; // Oculta a mensagem de "vazio"
+
+        fichasSalvas.forEach((ficha) => {
+            const li = document.createElement('li');
+            li.classList.add('ficha-item');
+
+            // Conteúdo da ficha
+            li.innerHTML = `
+                <a href="javascript:void(0)" onclick="carregarFicha(${ficha.id})">
+                    <strong>Nome do Personagem:</strong> ${ficha.nome} <br>
+                    <strong>XP:</strong> ${ficha.xp} <br>
+                    <strong>Vida Total:</strong> ${ficha.vida_total}
+                </a>
+            `;
+
+            listaFichas.appendChild(li); // Adiciona o item à lista
+        });
+    } else {
+        mensagemVazia.style.display = 'block'; // Exibe a mensagem se não houver fichas
+    }
+}
+
+// Chamar a função ao carregar a página
+document.addEventListener('DOMContentLoaded', listarFichas);
+
+
+    </script>
 </body>
 </html>

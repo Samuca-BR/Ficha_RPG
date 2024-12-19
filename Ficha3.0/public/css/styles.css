@@ -328,3 +328,24 @@ footer {
     line-height: 1.6;
     text-align: center;
 }
+
+.fichas-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.ficha-item {
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.ficha-item a {
+    text-decoration: none;
+    color: #333;
+}
+
+.ficha-item a:hover {
+    color: #007bff;
+}

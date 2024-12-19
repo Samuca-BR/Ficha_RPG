@@ -260,11 +260,79 @@
             <h2>Talentos e Magias</h2>
             <div class="campo">
                 <textarea id="talentos-magias" name="talentos-magias"></textarea>
-                
+            </div>
+            <div class="campo">
+                <button onclick="salvarFicha()">Salvar</button>
+                <button onclick="carregarFicha()">Carregar</button>
             </div>
         </div>
     </div>
         <script src="/js/ficha.js" defer></script> <!-- Vincula o JavaScript externo das funções de calculo -->
+    <script src="/js/pericias.js" defer></script> <!--Vincula o JavaScript externo para função de salvar as pericias da ficha-->
+<script>
+    function salvarFicha() {
+        const fichaData = {
+            nome: document.getElementById('nome').value,
+            classe: document.getElementById('classe').value,
+            vida_total: parseInt(document.getElementById('vida-total').value) || 0,
+            vida_atual: parseInt(document.getElementById('vida-atual').value) || 0,
+            xp: parseInt(document.getElementById('xp').value) || 0,
+            forca: parseInt(document.getElementById('forca').value) || 0,
+            destreza: parseInt(document.getElementById('destreza').value) || 0,
+            constituicao: parseInt(document.getElementById('constituição').value) || 0,
+            inteligencia: parseInt(document.getElementById('inteligencia').value) || 0,
+            sabedoria: parseInt(document.getElementById('sabedoria').value) || 0,
+            carisma: parseInt(document.getElementById('carisma').value) || 0,
+            ca: parseInt(document.getElementById('ca').textContent) || 0,
+            talentosMagias: document.getElementById('talentos-magias').value
+        };
+
+        fetch('/salvarFicha', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(fichaData)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Ficha salva com sucesso!');
+                } else {
+                    alert(`Erro ao salvar: ${data.error}`);
+                }
+            })
+            .catch(error => console.error('Erro ao salvar ficha:', error));
+    }
+
+    function carregarFicha() {
+        const id = prompt('Informe o ID da ficha para carregar:');
+        if (!id) return;
+
+        fetch(`/carregarFicha/${id}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const ficha = data.ficha;
+                    document.getElementById('nome').value = ficha.nome;
+                    document.getElementById('classe').value = ficha.classe;
+                    document.getElementById('vida-total').value = ficha.vida_total;
+                    document.getElementById('vida-atual').value = ficha.vida_atual;
+                    document.getElementById('xp').value = ficha.xp;
+                    document.getElementById('forca').value = ficha.forca;
+                    document.getElementById('destreza').value = ficha.destreza;
+                    document.getElementById('constituição').value = ficha.constituicao;
+                    document.getElementById('inteligencia').value = ficha.inteligencia;
+                    document.getElementById('sabedoria').value = ficha.sabedoria;
+                    document.getElementById('carisma').value = ficha.carisma;
+                    document.getElementById('ca').textContent = ficha.ca;
+                    document.getElementById('talentos-magias').value = ficha.talentosMagias;
+                    alert('Ficha carregada com sucesso!');
+                } else {
+                    alert(`Erro ao carregar ficha: ${data.error}`);
+                }
+            })
+            .catch(error => console.error('Erro ao carregar ficha:', error));
+    }
+</script>
 </body>
 
 </html>
