@@ -104,11 +104,27 @@ app.get('/perfil', (req, res) => {
 // Rota para salvar ficha
 app.post('/salvarFicha', (req, res) => {
     const {
-        nome, classe, vida_total, vida_atual, xp, forca, destreza, constituicao,
-        inteligencia, sabedoria, carisma, ca, pericias, talentosMagias
+        nome = '',
+        classe = '',
+        vida_total = 0,
+        vida_atual = 0,
+        xp = 0,
+        forca = 0,
+        destreza = 0,
+        constituicao = 0,
+        inteligencia = 0,
+        sabedoria = 0,
+        carisma = 0,
+        ca = 0,
+        pericias = [],
+        talentosMagias = []
     } = req.body;
 
     const userId = req.session.userId;
+
+    if (!userId) {
+        return res.status(400).json({ success: false, error: 'Usuário não autenticado.' });
+    }
 
     const sqlFicha = `
         INSERT INTO ficha (nome, classe, vida_total, vida_atual, xp, forca, destreza, 
@@ -116,57 +132,46 @@ app.post('/salvarFicha', (req, res) => {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    db.query(sqlFicha, [nome, classe, vida_total, vida_atual, xp, forca, destreza,
-        constituicao, inteligencia, sabedoria, carisma, ca, userId], (err, result) => {
-            if (err) {
-                console.error('Erro ao salvar ficha:', err);
-                return res.status(500).json({ success: false, error: 'Erro ao salvar ficha.' });
-            }
+    db.query(sqlFicha, [
+        nome, classe, vida_total, vida_atual, xp, forca, destreza,
+        constituicao, inteligencia, sabedoria, carisma, ca, userId
+    ], (err, result) => {
+        if (err) {
+            console.error('Erro ao salvar ficha:', err);
+            return res.status(500).json({ success: false, error: 'Erro ao salvar ficha.' });
+        }
 
-            const fichaId = result.insertId;
+        const fichaId = result.insertId;
 
-            // Salvar perícias
+        // Salvar perícias
+        if (Array.isArray(pericias)) {
             const sqlPericias = `
-                INSERT INTO tabelapericias 
-                (nome, possui, bonus, treino, total, anotacao, ficha_id) 
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO tabelapericias (nome, bonus, anotacao, ficha_id) 
+                VALUES (?, ?, ?, ?)
             `;
-            if (Array.isArray(pericias)) {
-                pericias.forEach(pericia => {
-                    db.query(sqlPericias, [
-                        pericia.nome, pericia.possui, pericia.bonus, pericia.treino,
-                        pericia.total, pericia.anotacao, fichaId
-                    ], (err) => {
-                        if (err) console.error('Erro ao salvar perícia:', err);
-                    });
+            pericias.forEach(pericia => {
+                const { nome, bonus = 0, anotacao = '' } = pericia;
+                db.query(sqlPericias, [nome, bonus, anotacao, fichaId], (err) => {
+                    if (err) console.error('Erro ao salvar perícia:', err);
                 });
-            }
+            });
+        }
 
-            // Salvar talentos e magias
+        // Salvar talentos e magias
+        if (Array.isArray(talentosMagias)) {
             const sqlTalentosMagias = `
-                INSERT INTO talentos_magias (descricao, ficha_id) VALUES (?, ?)
+                INSERT INTO talentos_magias (descricao, ficha_id) 
+                VALUES (?, ?)
             `;
-            if (Array.isArray(talentosMagias)) {
-                talentosMagias.forEach(descricao => {
-                    db.query(sqlTalentosMagias, [descricao, fichaId], (err) => {
-                        if (err) {
-                            console.error('Erro ao salvar talentos/magias:', err);
-                            return res.status(500).json({ success: false, error: 'Erro ao salvar talentos/magias.' });
-                        }
-                    });
+            talentosMagias.forEach(descricao => {
+                db.query(sqlTalentosMagias, [descricao, fichaId], (err) => {
+                    if (err) console.error('Erro ao salvar talentos/magias:', err);
                 });
-            } else {
-                // Caso seja uma única string
-                db.query(sqlTalentosMagias, [talentosMagias, fichaId], (err) => {
-                    if (err) {
-                        console.error('Erro ao salvar talentos/magias:', err);
-                        return res.status(500).json({ success: false, error: 'Erro ao salvar talentos/magias.' });
-                    }
-                });
-            }
+            });
+        }
 
-            res.json({ success: true });
-        });
+        res.json({ success: true, fichaId });
+    });
 });
 
 // Rota para exibir uma ficha específica

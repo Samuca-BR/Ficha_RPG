@@ -302,36 +302,54 @@
             })
             .catch(error => console.error('Erro ao salvar ficha:', error));
     }
+function carregarFicha() {
+    const id = prompt('Informe o ID da ficha para carregar:');
+    if (!id) return;
 
-    function carregarFicha() {
-        const id = prompt('Informe o ID da ficha para carregar:');
-        if (!id) return;
+    fetch(`/carregarFicha/${id}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const ficha = data.ficha;
 
-        fetch(`/carregarFicha/${id}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const ficha = data.ficha;
-                    document.getElementById('nome').value = ficha.nome;
-                    document.getElementById('classe').value = ficha.classe;
-                    document.getElementById('vida-total').value = ficha.vida_total;
-                    document.getElementById('vida-atual').value = ficha.vida_atual;
-                    document.getElementById('xp').value = ficha.xp;
-                    document.getElementById('forca').value = ficha.forca;
-                    document.getElementById('destreza').value = ficha.destreza;
-                    document.getElementById('constituição').value = ficha.constituicao;
-                    document.getElementById('inteligencia').value = ficha.inteligencia;
-                    document.getElementById('sabedoria').value = ficha.sabedoria;
-                    document.getElementById('carisma').value = ficha.carisma;
-                    document.getElementById('ca').textContent = ficha.ca;
-                    document.getElementById('talentos-magias').value = ficha.talentosMagias;
-                    alert('Ficha carregada com sucesso!');
-                } else {
-                    alert(`Erro ao carregar ficha: ${data.error}`);
+                // Preenche os campos básicos da ficha
+                document.getElementById('nome').value = ficha.nome;
+                document.getElementById('classe').value = ficha.classe;
+                document.getElementById('vida-total').value = ficha.vida_total;
+                document.getElementById('vida-atual').value = ficha.vida_atual;
+                document.getElementById('xp').value = ficha.xp;
+                document.getElementById('forca').value = ficha.forca;
+                document.getElementById('destreza').value = ficha.destreza;
+                document.getElementById('constituição').value = ficha.constituicao;
+                document.getElementById('inteligencia').value = ficha.inteligencia;
+                document.getElementById('sabedoria').value = ficha.sabedoria;
+                document.getElementById('carisma').value = ficha.carisma;
+                document.getElementById('ca').value = ficha.ca;
+
+                // Preenche as perícias
+                const pericias = data.pericias; // Array de perícias
+                pericias.forEach(pericia => {
+                    const bonusField = document.getElementById(`bonus-${pericia.nome}`);
+                    const anotacaoField = document.getElementById(`anotacao-${pericia.nome}`);
+                    if (bonusField) bonusField.value = pericia.bonus;
+                    if (anotacaoField) anotacaoField.value = pericia.anotacao;
+                });
+
+                // Preenche os talentos e magias
+                const talentosMagias = data.talentosMagias; // Array de talentos/magias
+                const talentosMagiasField = document.getElementById('talentos-magias');
+                if (talentosMagiasField && Array.isArray(talentosMagias)) {
+                    talentosMagiasField.value = talentosMagias.map(tm => tm.descricao).join('\n');
                 }
-            })
-            .catch(error => console.error('Erro ao carregar ficha:', error));
-    }
+
+                alert('Ficha carregada com sucesso!');
+            } else {
+                alert(`Erro ao carregar ficha: ${data.error}`);
+            }
+        })
+        .catch(error => console.error('Erro ao carregar ficha:', error));
+}
+
 </script>
 </body>
 
