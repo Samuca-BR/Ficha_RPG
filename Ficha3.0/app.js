@@ -40,11 +40,11 @@ app.get('/cadastro', (req, res) => {
 
 // Rota para processar o cadastro
 app.post('/cadastro', (req, res) => {
-    const { nome_usuario, senha } = req.body;
+    const { nome, senha } = req.body;
     const senha_hash = crypto.createHash('sha256').update(senha).digest('hex');
 
-    const sql = 'INSERT INTO usuario (nome_usuario, senha_hash) VALUES (?, ?)';
-    db.query(sql, [nome_usuario, senha_hash], (err) => {
+    const sql = 'INSERT INTO usuario (nome, senha) VALUES (?, ?)';
+    db.query(sql, [nome, senha_hash], (err) => {
         if (err) {
             console.error('Erro ao cadastrar usuário:', err);
             return res.status(500).send('Erro ao cadastrar usuário');
@@ -55,11 +55,11 @@ app.post('/cadastro', (req, res) => {
 
 // Rota para processar o login
 app.post('/login', (req, res) => {
-    const { nome_usuario, senha } = req.body;
+    const { nome, senha } = req.body;
     const senha_hash = crypto.createHash('sha256').update(senha).digest('hex');
 
-    const sql = 'SELECT * FROM usuario WHERE nome_usuario = ? AND senha_hash = ?';
-    db.query(sql, [nome_usuario, senha_hash], (err, result) => {
+    const sql = 'SELECT * FROM usuario WHERE nome = ? AND senha = ?';
+    db.query(sql, [nome, senha_hash], (err, result) => {
         if (err) {
             console.error('Erro ao fazer login:', err);
             return res.status(500).send('Erro ao fazer login');
@@ -91,13 +91,15 @@ app.get('/perfil', (req, res) => {
         return res.redirect('/login');
     }
 
+    const userId = req.session.userId;
     const sql = 'SELECT * FROM ficha WHERE usuario_id = ?';
-    db.query(sql, [req.session.userId], (err, results) => {
+
+    db.query(sql, [userId], (err, fichas) => {
         if (err) {
             console.error('Erro ao buscar fichas:', err);
-            return res.status(500).send('Erro ao buscar fichas');
+            return res.status(500).send('Erro ao buscar fichas.');
         }
-        res.render('perfil', { fichas: results });
+        res.render('perfil', { fichas });
     });
 });
 
@@ -146,7 +148,7 @@ app.post('/salvarFicha', (req, res) => {
         // Salvar perícias
         if (Array.isArray(pericias)) {
             const sqlPericias = `
-                INSERT INTO tabelapericias (nome, bonus, anotacao, ficha_id) 
+                INSERT INTO pericias (nome, bonus, anotacao, ficha_id) 
                 VALUES (?, ?, ?, ?)
             `;
             pericias.forEach(pericia => {
@@ -170,7 +172,7 @@ app.post('/salvarFicha', (req, res) => {
             });
         }
 
-        res.json({ success: true, fichaId });
+        res.redirect('/perfil');
     });
 });
 

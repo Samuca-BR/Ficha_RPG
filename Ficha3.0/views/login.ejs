@@ -15,8 +15,8 @@
             <h2>Login</h2>
             <form action="/login" method="POST">
                 <div class="campo">
-                    <label for="nome_usuario">Nome de Usuário:</label>
-                    <input type="text" id="nome_usuario" name="nome_usuario" required>
+                    <label for="nome">Nome de Usuário:</label>
+                    <input type="text" id="nome" name="nome" required>
                 </div>
                 <div class="campo">
                     <label for="senha">Senha:</label>
@@ -26,7 +26,10 @@
                     <button type="submit">Entrar</button>
                 </div>
                 <div class="mensagem">
-                    <!-- Aqui você pode exibir mensagens de erro/sucesso -->
+                    <!-- Exibe a mensagem de erro de login, caso haja -->
+                    <% if (typeof mensagemErro !== 'undefined') { %>
+                        <p class="erro"><%= mensagemErro %></p>
+                    <% } %>
                 </div>
             </form>
             <div class="link-troca">
